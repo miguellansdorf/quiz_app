@@ -1,0 +1,35 @@
+extends layout
+
+block content
+  div.container-fluid
+    div.row
+      div.col-md-4
+      div.col-md-4
+        .animated.bounceIn.login-form-container
+          //img.login-logo-ds(src="/img/LOGO.jpg", width="50%")
+          form.form-signin(action="/login", method="post")
+            center
+              h3.form-signin-heading.animated.bounceIn.delay-3 Quiz App
+            div.row
+              div.col-md-2
+              div.col-md-8
+                  if errorMessage.length > 0
+                    .alert.alert-danger.text-center.alert-custom
+                      i.fa.fa-frown-o
+                      | 
+                      =errorMessage
+                  if successMessage.length > 0
+                    .alert.alert-success.text-center= successMessage
+                  .well
+                    input#username.form-control(type='text', placeholder='Username', required='', autofocus='', name="username")
+                    br
+                    input#password.form-control(type='password', placeholder='Password', required='', name="password")
+                    .checkbox
+                      label
+                        input(type='checkbox', value='remember-me', name="remember")
+                        |  Remember me &nbsp;
+                  button.btn.btn-lg.btn-primary.btn-block.btn-login(type='submit') Sign in
+              div.col-md-8
+      div.col-md-4
+  script.
+    document.getElementById("main-toolbar").style.visibility = "hidden";

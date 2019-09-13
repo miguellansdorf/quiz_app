@@ -1,0 +1,79 @@
+extends layout
+
+block content
+    script(src='/javascripts/angular-controllers/test_creator_controller.js')
+    .main(ng-app="test-creator", ng-controller="myController", ng-cloak)
+        h2.page-header.text-center.animated.tada #{title}
+        .row
+            .col-md-12
+                .alert.alert-danger.text-center(ng-if="errorMessage") {{errorMessage}}
+                .alert.alert-success.text-center(ng-if="successMessage") {{successMessage}}
+        .row
+            .col-md-6
+                h4 Select Existing Projects
+                select.form-control(style="text-align-last:center;", ng-model="filter.project", ng-options="project.id as project.project for project in projects")
+            .col-md-6
+                h4 Create A New Project
+                .row
+                    .col-md-6
+                        input.form-control(type="text", ng-model="newProject.project", placeholder="New Project")
+                    .col-md-6
+                        button.btn.btn-success.form-control(ng-click="createProject(newProject.project)") Create Project
+        .row
+            .col-md-6.text-center
+                button.btn.btn-default.big-button(ng-click="setCategory('Simple')", ng-class="{true: 'btn-success', false: ''}[testCategorie == 'Simple']") 
+                    i.fa.fa-cube.fa-3x
+                    h4 Simple
+            .col-md-6.text-center
+                button.btn.btn-default.big-button(ng-click="setCategory('Complex')", ng-class="{true: 'btn-success', false: ''}[testCategorie == 'Complex']") 
+                    i.fa.fa-cubes.fa-3x
+                    h4 Complex
+        .row
+            .col-xs-12.col-sm-12.col-md-6.col-lg-6(ng-if="questions.length > 0")
+                h2.text-center Select Existing {{testCategorie}} Questions
+                .col-md-12
+                    ul
+                        li(ng-repeat="question in questions")
+                            span   
+                                button.btn.btn-sm(ng-if="question.active=='1'" ng-class="{true: 'btn-primary', false: 'btn-success'}[selectQuestionButtonName == 'Select']", ng-click="selectQuestionButtonName=='Select'?selectQuestion(question):unselectQuestion(question);selectQuestionButtonName=='Select'?selectQuestionButtonName='Selected':selectQuestionButtonName='Select'") {{selectQuestionButtonName}}
+                                p
+                                    a(href="", ng-click="editQuestion(question)", ng-class="{true: 'text-danger', false: 'text-primary'}[question.active == 0]") {{question.question}} [{{question.project}}] - (Created By: {{question.firstname}} {{question.lastname}} - Created on: {{question.creation_time}} - Active: {{question.active}})
+                .col-md-12
+                    .form-group.text-center
+                        button.btn.btn-success.form-control(ng-click="createTest()") Create test
+            .col-xs-12.col-sm-12.col-md-6.col-lg-6(ng-if="questions.length == 0 && testCategorie != '' && !loadingQuestions")
+                h2.text-center There are no {{testCategorie}} Questions Yet. Create Some first.
+            .col-xs-12.col-sm-12.col-md-6.col-lg-6.text-center(ng-if="questions.length == 0 && testCategorie != '' && loadingQuestions")
+                i.fa.fa-spinner.fa-spin.fa-3x.fa-fw
+            .col-xs-12.col-sm-12.col-md-6.col-lg-6.text-center(ng-if="testCategorie != ''")
+                h2 Add A New {{testCategorie}} Question
+                .col-md-12.text-center()
+                    .form-group
+                        label Question
+                        input.form-control(type="text", ng-model="question.question", placeholder="Question")
+                        label Duration
+                        input.form-control(type="number", ng-model="question.duration", placeholder="Duration", step=1, min=10)
+                        label Image
+                        input(type="file" file-model="question.image")
+                    .form-group
+                        label Answer 1
+                        input.form-control(type="text", ng-model="answers.answer1", placeholder="Answer 1")
+                        label Is this the correct answer?
+                        select.form-control(ng-model="answers.answer1Correct", ng-options="correct.id as correct.value for correct in answerCorrect")
+                    .form-group
+                        label Answer 2
+                        input.form-control(type="text", ng-model="answers.answer2", placeholder="Answer 2")
+                        label Is this the correct answer?
+                        select.form-control(ng-model="answers.answer2Correct", ng-options="correct.id as correct.value for correct in answerCorrect")
+                    .form-group
+                        label Answer 3
+                        input.form-control(type="text", ng-model="answers.answer3", placeholder="Answer 3")
+                        label Is this the correct answer?
+                        select.form-control(ng-model="answers.answer3Correct", ng-options="correct.id as correct.value for correct in answerCorrect")
+                    .form-group
+                        label Answer 4
+                        input.form-control(type="text", ng-model="answers.answer4", placeholder="Answer 4")
+                        label Is this the correct answer?
+                        select.form-control(ng-model="answers.answer4Correct", ng-options="correct.id as correct.value for correct in answerCorrect")
+                    .form-group
+                        button.btn.btn-success(ng-click="addQuestion()") Add Question

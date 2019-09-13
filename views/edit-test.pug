@@ -1,0 +1,141 @@
+extends layout
+
+block content
+    script(src='/javascripts/angular-controllers/test_editor_controller.js')
+    .main(ng-app="test-editor", ng-controller="myController", ng-cloak)
+        h1.page-header.text-center #{title}
+        .col-md-12
+            .alert.alert-danger.text-center(ng-if="errorMessage") {{errorMessage}}
+            .alert.alert-success.text-center(ng-if="successMessage") {{successMessage}}
+        .col-md-12.text-center
+            h2 Select A Project
+            select.form-control(style="text-align-last:center;", ng-model="filter.project", ng-options="project.id as project.project for project in projects")
+        .col-md-12(ng-if="filter.project != ''")
+            .col-md-6.col-sm-12
+                h3.text-center Tests
+                .form-group(ng-if="selectedTest=='' && tests.length > 0")
+                    input.form-control(type="text", ng-model="filter.test", placeholder="Filter Tests")
+                p.text-center
+                    button.btn.btn-sm.btn-primary(ng-click="newTest = !newTest") New Test
+                .col-md-12.text-center(ng-if="newTest")
+                    .form-group
+                        h4 New Test
+                        input.form-control(type="text", ng-model="test.test", placeholder="Test")
+                    .form-group
+                        button.btn.btn-success(ng-click="createTest()") Create Test
+                .col-md-12
+                    ul(ng-if="selectedTest=='' && tests.length > 0")
+                        li(ng-repeat="test in tests | testFilter:filter.test:this")
+                            a(ng-click="selectTest(test)", href="") {{test.test}} - (Created by: {{test.firstname}} {{test.lastname}} - Created on: {{test.creation_time}} - Enabled: {{test.active}})
+                    .col-md-12.text-center(ng-if="selectedTest=='' && tests.length == 0 && loadingTests")
+                        i.fa.fa-spinner.fa-spin.fa-3x.fa-fw
+                    .col-md-12.text-center(ng-if="tests.length == 0 && !loadingTests")
+                        h4 No Tests Found!!
+                    .col-md-12(ng-if="selectedTest!=''")
+                        h4.text-center Now editing "{{selectedTest.test}}"
+                        h4.text-center Type: {{testQuestions[0].category}}
+                        .form-group.text-center
+                            button.btn.btn-primary(ng-click="unselectTest()") Unselect Test
+                        .form-group.text-center
+                            input.form-control(type="text", ng-model="selectedTest.test")
+                        .form-group.text-center
+                            button.btn.btn-success(ng-click="updateTestName(selectedTest)") Update Test Name
+                        .form-group.text-center
+                            button.btn.btn-danger(ng-if="selectedTest.active", ng-click="deactivateTest(selectedTest)") Deactivate Test
+                            button.btn.btn-success(ng-if="!selectedTest.active", ng-click="activateTest(selectedTest)") Activate Test
+                        if user.role_id == 3
+                            .form-group.text-center
+                                button.btn.btn-danger(ng-click="deleteTest(selectedTest)") Delete Test
+                        .col-md-12
+                            h5 Test Questions ({{testQuestions.length}})
+                            ul
+                                li(ng-repeat="question in testQuestions")
+                                    span
+                                        button.btn.btn-sm.btn-primary(ng-click="removeTestQuestion(question)") Remove Question
+                                    span &nbsp;
+                                    span {{question.question}}
+                                    p
+                            i.fa.fa-spinner.fa-spin.fa-3x.fa-fw(ng-if="testQuestions.length == 0 && loadingTestQuestions")
+                    
+            .col-md-6.col-sm-12
+                h3.text-center Questions
+                .form-group(ng-if="selectedQuestion=='' && questions.length > 0")
+                    input.form-control(type="text", ng-model="filter.question", placeholder="Filter Questions")
+                p.text-center
+                    button.btn.btn-sm.btn-primary(ng-click="newQuestion = !newQuestion") New Question
+                .col-md-12.text-center(ng-if="newQuestion")
+                    .form-group
+                        h4 New Question
+                        input.form-control(type="text", ng-model="question.question", placeholder="Question")
+                        label Duration
+                        input.form-control(type="number", ng-model="question.duration", placeholder="Duration", step=1, min=10)
+                        label Category
+                        select.form-control(ng-model="question.category", ng-options="category.id as category.value for category in categories")
+                        label Image
+                        input(type="file" file-model="question.image")
+                    .form-group
+                        label Answer 1
+                        input.form-control(type="text", ng-model="answers.answer1", placeholder="Answer 1")
+                        label Is this the correct answer?
+                        select.form-control(ng-model="answers.answer1Correct", ng-options="correct.id as correct.value for correct in answerCorrect")
+                    .form-group
+                        label Answer 2
+                        input.form-control(type="text", ng-model="answers.answer2", placeholder="Answer 2")
+                        label Is this the correct answer?
+                        select.form-control(ng-model="answers.answer2Correct", ng-options="correct.id as correct.value for correct in answerCorrect")
+                    .form-group
+                        label Answer 3
+                        input.form-control(type="text", ng-model="answers.answer3", placeholder="Answer 3")
+                        label Is this the correct answer?
+                        select.form-control(ng-model="answers.answer3Correct", ng-options="correct.id as correct.value for correct in answerCorrect")
+                    .form-group
+                        label Answer 4
+                        input.form-control(type="text", ng-model="answers.answer4", placeholder="Answer 4")
+                        label Is this the correct answer?
+                        select.form-control(ng-model="answers.answer4Correct", ng-options="correct.id as correct.value for correct in answerCorrect")
+                    .form-group
+                        button.btn.btn-success(ng-click="addQuestion()") Add Question
+                .col-md-12
+                    ul(ng-if="selectedQuestion=='' && questions.length > 0")
+                        li(ng-repeat="question in questions | questionFilter:filter.question:this")
+                            span(ng-if="selectedTest!='' && (testQuestions[0].category == question.category || testQuestions.length == 0) && !loadingTestQuestions")
+                                button.btn.btn-sm.btn-primary(ng-click="addTestQuestion(question)") Add Question
+                            span &nbsp;
+                            a(ng-click="selectQuestion(question)", href="", ng-class="{true: 'text-danger', false: 'text-primary'}[question.active == 0]") {{question.question}} [{{question.project}}] - {{question.category}} - (Created by: {{question.firstname}} {{question.lastname}} - Created on: {{question.creation_time}} - active: {{question.active}})
+                            p
+                    .col-md-12.text-center(ng-if="selectedQuestion=='' && questions.length == 0 && loadingQuestions")
+                        i.fa.fa-spinner.fa-spin.fa-3x.fa-fw
+                    .col-md-12.text-center(ng-if="questions.length == 0 && !loadingQuestions")
+                        h4 No Questions Found!!
+                    .col-md-12.text-center(ng-if="selectedQuestion!=''")
+                        h4 Now editing "{{selectedQuestion.question}}"
+                        .form-group
+                            button.btn.btn-primary(ng-click="unselectQuestion()") Unselect Question
+                        .form-group
+                            button.btn.btn-success(ng-click="activateQuestion(selectedQuestion)" ng-if="selectedQuestion.active == 0") Activate
+                            button.btn.btn-danger(ng-click="deactivateQuestion(selectedQuestion)" ng-if="selectedQuestion.active == 1") Deactivate
+                        if user.role_id == 3
+                            .form-group
+                                button.btn.btn-danger(ng-click="deleteQuestion(selectedQuestion)") Delete Question
+                        .form-group
+                            label Question
+                            input.form-control(type="text", ng-model="selectedQuestion.question")
+                            label Duration
+                            input.form-control(type="number", ng-model="selectedQuestion.duration", step=1, min=10)
+                            label Image
+                            img.question-image(ng-if="selectedQuestion.image" src="/uploads/{{selectedQuestion.image}}")
+                        .form-group
+                            input(type="file", file-model="newImage.image")
+                            label Update Or Remove Image
+                            select.form-control(ng-model="updateImage.value", ng-options="option.id as option.value for option in updateImageOptions")
+                        .form-group(ng-repeat="answer in questionAnswers", ng-if="questionAnswers.length > 0 && !loadingQuestionsAnswers")
+                            label Answer {{$index + 1}}
+                            input.form-control(type="text", ng-model="answer.answer")
+                            label Is this the correct answer?
+                            select.form-control(ng-model="answer.correct", ng-options="correct.id as correct.value for correct in answerCorrect")
+                        .form-group.text-center(ng-if="questionAnswers.length > 0 && !loadingQuestionsAnswers")
+                            button.btn.btn-success(ng-click="updateQuestion()") Update Question
+                        h4.text-center(ng-if="questionAnswers.length == 0 && loadingQuestionsAnswers")
+                            i.fa.fa-spinner.fa-spin.fa-3x.fa-fw
+                        .col-md-4
+                        .col-md-12.text-center

@@ -1,0 +1,22 @@
+extends layout
+
+block content
+    h2.text-center.animated.tada #{title}
+    .col-md-12.animated
+      .col-md-6.text-center.animated.bounceInUp.delay-2
+        button.btn.btn-default.big-button(onclick="location.href='take-test'") 
+          i.fa.fa-play.fa-3x
+          h4 Take Test
+      .col-md-6.text-center.animated.bounceInUp.delay-2
+        button.btn.btn-default.big-button(onclick="location.href='statistics'") 
+          i.fa.fa-bar-chart.fa-3x
+          h4 Statistics
+      if user.role_id > 1
+        .col-md-6.text-center.animated.bounceInUp.delay-3
+          button.btn.btn-default.big-button(onclick="location.href='create-test'") 
+            i.fa.fa-plus.fa-3x
+            h4 Create Questions & Tests
+        .col-md-6.text-center.animated.bounceInUp.delay-3
+          button.btn.btn-default.big-button(onclick="location.href='edit-test'") 
+            i.fa.fa-pencil.fa-3x
+            h4 Edit Questions & Tests

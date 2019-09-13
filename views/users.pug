@@ -1,0 +1,68 @@
+extends layout
+
+block content
+	script(src='/javascripts/angular-controllers/user_management_controller.js')
+	.main(ng-app="user-management", ng-controller="myController", ng-cloak)
+		h1.page-header.text-center #{title}
+		.col-xs-12.col-sm-12.col-md-12
+			.alert.alert-danger.text-center(ng-if="errorMessage") {{errorMessage}}
+			.alert.alert-success.text-center(ng-if="successMessage") {{successMessage}}
+			.form-group
+				button.btn.btn-primary.btn-sm.form-control(ng-click="createNewUser=!createNewUser") New User
+			form(ng-if="createNewUser", name="createUserForm")
+				.form-group
+					input.form-control(type="text", ng-model="newUser.firstname", placeholder="Firstname", ng-required="true")
+				.form-group
+					input.form-control(type="text", ng-model="newUser.lastname", placeholder="Lastname", ng-required="true")
+				.form-group
+					input.form-control(type="text", ng-model="newUser.email", placeholder="Email", ng-required="true")
+				.form-group
+					input.form-control(type="text", ng-model="newUser.username", placeholder="Username", ng-required="true")
+				.form-group
+					input.form-control(type="password", ng-model="newUser.password", placeholder="Password", ng-required="true")
+				.form-group
+					input.form-control(type="password", ng-model="newUser.password_repeat", placeholder="Repeat Password", ng-required="true")
+				.form-group
+					select.form-control(ng-model="newUser.role_id", ng-options="role.id as role.name for role in roles", ng-required="true")
+				.form-group
+					button.btn.btn-success.btn-sm.form-control(ng-click="createUserForm.$valid && createUser()") Create User
+			table.table.table-bordered.table-hover.table-responsive
+				thead.bg-primary
+					tr
+						th(ng-click="orderByField='username'; reverseSort = !reverseSort") Username
+						th(ng-click="orderByField='firstname'; reverseSort = !reverseSort") Firstname
+						th(ng-click="orderByField='lastname'; reverseSort = !reverseSort") Lastname
+						th(ng-click="orderByField='email'; reverseSort = !reverseSort") Email
+						th(ng-click="orderByField='role_id'; reverseSort = !reverseSort") Role
+						th(ng-click="orderByField='active'; reverseSort = !reverseSort") Active
+						th
+						th
+				tbody
+					tr(ng-repeat="user in users | orderBy:orderByField:reverseSort")
+						td 
+							input.form-control(type="text", ng-disabled="buttonName=='Edit'", ng-model="user.username") 
+						td 
+							input.form-control(type="text", ng-disabled="buttonName=='Edit'", ng-model="user.firstname")
+						td 
+							input.form-control(type="text", ng-disabled="buttonName=='Edit'", ng-model="user.lastname")
+						td 
+							input.form-control(type="text", ng-disabled="buttonName=='Edit'", ng-model="user.email") 
+						td 
+							select.form-control(ng-disabled="buttonName=='Edit'", ng-model="user.role_id", ng-options="role.id as role.name for role in roles")
+						td 
+							select.form-control(ng-disabled="buttonName=='Edit'", ng-model="user.active", ng-options="activeOption.id as activeOption.value for activeOption in activeOptions")
+						td 
+							button.btn.btn-primary.btn-sm.form-control(ng-click="buttonName=='Save'?updateUser(user, $index):'';buttonName=='Edit'?buttonName='Save':buttonName='Edit'") {{buttonName}}
+						td
+							button.btn.btn-danger.btn-sm.form-control(data-toggle="modal", data-target="#confirmDelete", ng-click="getUserInfoForDeletion(user, $index)") Delete
+			.modal.fade(id="confirmDelete", role="dialog")
+				.modal-dialog
+					.modal-content
+						.modal-header
+							button.close(data-dismiss="modal") &times;
+							h4.modal-title Confirm Delete 
+						.modal-body
+							p Are you sure you want to delete user {{userToDelete.username}} with ID {{userToDelete.user_id}}?
+						.modal-footer
+							button.btn.btn-success(data-dismiss="modal", ng-click="deleteUser(userToDelete, $index);") Yes
+							button.btn.btn-danger(data-dismiss="modal") No

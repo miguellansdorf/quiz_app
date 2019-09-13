@@ -1,0 +1,162 @@
+extends layout
+
+block content
+	script(src='/javascripts/angular-controllers/test_taker_controller.js')
+	.main(ng-app="test-taker", ng-controller="myController", ng-cloak)
+		h3.page-header.text-center.animated.tada #{title}
+		.col-md-12
+			.alert.alert-danger.text-center(ng-if="errorMessage") {{errorMessage}}
+			.alert.alert-success.text-center(ng-if="successMessage") {{successMessage}}
+		.col-md-12(ng-if="selectedTest==''")
+			.form-group
+				.col-xs-12.col-sm-12.col-md-4.col-lg-4
+					h4 Please Select a Project
+				.col-xs-6.col-sm-6.col-md-4.col-lg-4
+					select.form-control(ng-model="test.project", ng-options="project.id as project.project for project in projects")
+				.col-xs-6.col-sm-6.col-md-4.col-lg-4
+					button.btn.btn-primary(ng-click="loadTests(test.project)") Load project
+		.col-md-12(ng-if="selectedTest==''")
+			.col-md-6.col-sm-12.animated.flipInX(ng-if="selectedTest=='' && simpleTests.length > 0")
+				h4 Simple Tests
+				ul
+					li(ng-repeat="test in simpleTests")
+						a(ng-click="selectTest(test.test)", href="") {{test.test}} (Created by: {{test.firstname}} {{test.lastname}} - Created on: {{test.creation_time}})
+			.col-md-6.col-sm-12.animated.flipInX(ng-if="selectedTest=='' && complexTests.length > 0")
+				h4 Complex Tests
+				ul
+					li(ng-repeat="test in complexTests")
+						a(ng-click="selectTest(test.test)", href="") {{test.test}} (Created by: {{test.firstname}} {{test.lastname}} - Created on: {{test.creation_time}})
+		.col-md-12(ng-if="selectedTest=='' && !loadingTests")
+			.col-md-4.col-sm-12.animated.fadeInUp(ng-if="simpleCount > 0")
+				h4 Configure a Random Simple Test (Total: {{simpleCount}})
+				.form-group
+					.row
+						.col-xs-12.col-sm-12.col-md-4.col-lg-4
+							label Number of questions
+						.col-xs-12.col-sm-12.col-md-4.col-lg-4
+							input.form-control(type="number", ng-model="random.simpleQuestionsCount", step=1, min=1, max="{{simpleCount}}")
+						.col-xs-12.col-sm-12.col-md-4.col-lg-4
+							button.btn.btn-primary(ng-click="selectTest('Random Simple Test')") Generate
+			.col-md-4.col-sm-12.animated.fadeInUp(ng-if="complexCount > 0")
+				h4 Configure a Random Complex Test (Total: {{complexCount}})
+				.form-group
+					.row
+						.col-xs-12.col-sm-12.col-md-4.col-lg-4
+							label Number of questions
+						.col-xs-12.col-sm-12.col-md-4.col-lg-4
+							input.form-control(type="number", ng-model="random.complexQuestionsCount", step=1, min=1, max="{{complexCount}}")
+						.col-xs-12.col-sm-12.col-md-4.col-lg-4
+							button.btn.btn-primary(ng-click="selectTest('Random Complex Test')") Generate
+			.col-md-4.col-sm-12.animated.fadeInUp(ng-if="simpleCount > 0 && complexCount > 0")
+				h4 Configure a Random Mixed Test (Total: {{simpleCount + complexCount}})
+				.form-group
+					.row
+						.col-xs-12.col-sm-12.col-md-4.col-lg-4
+							label Number of questions
+						.col-xs-12.col-sm-12.col-md-4.col-lg-4
+							input.form-control(type="number", ng-model="random.mixedQuestionsCount", step=1, min=1, max="{{simpleCount + complexCount}}")
+						.col-xs-12.col-sm-12.col-md-4.col-lg-4
+							button.btn.btn-primary(ng-click="selectTest('Random Mixed Test')") Generate
+		.col-md-12(ng-if="(selectedTest!='' && sessionID=='') || testFinished")
+			.col-md-12.text-center
+				.col-md-6.col-sm-12
+					h2 Leaderboard - Global
+					table.table.table-bordered.table-hover.table-responsive.centered-table-header(ng-if="leaderboard.length > 0")
+						thead.bg-primary
+							tr
+								th #
+								th Name
+								th Average Questions Per Second
+								th Average Correct Percentage
+								th Score
+						tbody
+							tr(ng-repeat="leader in leaderboard")
+								td {{$index + 1}}
+								td {{leader.firstname}} {{leader.lastname}}
+								td {{leader.average_question_per_second}}
+								td {{leader.average_correct_percentage}}%
+								td {{leader.score}}
+					.col-md-12(ng-if="leaderboard.length == 0 && loadingLeaderboard")
+						i.fa.fa-spinner.fa-spin.fa-3x.fa-fw
+					.col-md-12(ng-if="leaderboard.length == 0 && !loadingLeaderboard")
+						h3 Sorry, no leaders found
+				.col-md-6.col-sm-12
+					h2 Leaderboard - Today
+					table.table.table-bordered.table-hover.table-responsive.centered-table-header(ng-if="leaderboardToday.length > 0")
+						thead.bg-primary
+							tr
+								th #
+								th Name
+								th Average Questions Per Second
+								th Average Correct Percentage
+								th Score
+						tbody
+							tr(ng-repeat="leader in leaderboardToday")
+								td {{$index + 1}}
+								td {{leader.firstname}} {{leader.lastname}}
+								td {{leader.average_question_per_second}}
+								td {{leader.average_correct_percentage}}%
+								td {{leader.score}}
+					.col-md-12(ng-if="leaderboardToday.length == 0 && loadingLeaderboardToday")
+						i.fa.fa-spinner.fa-spin.fa-3x.fa-fw
+					.col-md-12(ng-if="leaderboardToday.length == 0 && !loadingLeaderboardToday")
+						h3 Sorry, no leaders found
+		.col-md-12.taketestholder.animated.rollIn(ng-if="selectedTest!='' && sessionID==''")
+			h3.text-center {{selectedTest.test}}
+			.row
+				.col-md-3
+					h4 Category: {{selectedTest.category}}
+				.col-md-3
+					h4 Created by: {{selectedTest.firstname}} {{selectedTest.lastname}}
+				.col-md-3
+					h4 Created on: {{selectedTest.creation_time}}
+				.col-md-3
+					h4 Questions: 
+						span(ng-if="!loadingQuestions") {{questions.length}}
+						span(ng-if="loadingQuestions")
+							i.fa.fa-spinner.fa-spin.fa-2x.fa-fw
+			div(ng-if="questions.length > 0 && !loadingQuestions")
+				button.btn.btn-success.animated.rubberBand.delay-3(ng-click="startTest(selectedTest)") Start Test
+				button.btn.btn-primary.margin-left-20.animated.rubberBand.delay-3(ng-click="unselectTest()") Different Test
+		.col-md-12(ng-if="sessionID!='' && questionIndex < questions.length")
+			.row.well
+				.col-xs-4.col-sm-4.col-md-4.col-lg-4
+					h4 Time Left: {{selectedQuestion.duration}}
+				.col-xs-4.col-sm-4.col-md-4.col-lg-4
+					h4 Total: {{sessionSeconds}} Second(s) : {{sessionMinutes}} Minute(s) : {{sessionHours}} Hour(s)
+				.col-xs-4.col-sm-4.col-md-4.col-lg-4
+					h4 Question: {{questionIndex + 1}}/{{questions.length}}
+			hr
+			h3.text-center {{selectedQuestion.question}}
+			img.question-image(ng-if="selectedQuestion.image" src="/uploads/{{selectedQuestion.image}}")
+			.col-lg-6.col-md-6.col-sm-12.col-xs-12.text-center(ng-if="!questionAnswered && selectedQuestion.duration > 0", ng-repeat="answer in answers")
+				.btn.btn-default.big-button.button-custom(ng-click="submitAnswer(answer, 0)") 
+					.antwoord-veld {{answer.answer}}
+			.col-md-12.text-center(ng-if="questionAnswered")
+				h4(ng-if="questionAnswers.auto_selected == 0 && questionAnswers!=''") Chosen Answer: {{questionAnswers.answer}}
+				h4(ng-if="questionAnswers.auto_selected == 1 && questionAnswers!=''") Automatically Chosen Incorrect Answer: {{questionAnswers.answer}}
+				h4(ng-if="questionAnswers!=''") Correct Answer: {{questionAnswers.correct_answer}}
+				i.fa.fa-check-circle.fa-3x.text-success(ng-if="questionAnswers.answer == questionAnswers.correct_answer && questionAnswers!=''")
+				i.fa.fa-times.fa-3x.text-danger(ng-if="questionAnswers.answer != questionAnswers.correct_answer && questionAnswers!=''")
+				h4
+					button.btn.btn-primary(ng-if="questionIndex < questions.length - 1",ng-click="nextQuestion()") Next Question
+					button.btn.btn-success(ng-if="questionIndex == questions.length - 1",ng-click="nextQuestion()") View All Results
+		.col-md-12.text-center(ng-if="testFinished && testResults!=''")
+			h2 Results
+			h4 Test Taken: {{testResults.test}}
+			h4 Type: {{selectedTest.category}}
+			h4 Number Of Questions: {{questions.length}}
+			h4 Questions Answered Correctly: {{testResults.correct_answers}}
+			h4 Percentage: {{testResults.correct_answers_percentage}}%
+			h4 Test Duration: {{testResults.duration}} seconds
+		.col-md-12.text-center(ng-if="testFinished && resultAnswers!=''")
+			.col-lg-4.col-md-6.col-sm-12(ng-repeat="answer in resultAnswers")
+				h3 Question {{$index + 1}}: {{answer.question}}
+				img.question-image(ng-if="answer.image" src="/uploads/{{answer.image}}")
+				h4(ng-if="answer.auto_selected == 0") Chosen Answer: {{answer.answer}}
+				h4(ng-if="answer.auto_selected == 1") Automatically Chosen Incorrect Answer: {{answer.answer}}
+				h4 Correct Answer: {{answer.correct_answer}}
+				i.fa.fa-check-circle.fa-3x.text-success(ng-if="answer.answer == answer.correct_answer")
+				i.fa.fa-times.fa-3x.text-danger(ng-if="answer.answer != answer.correct_answer")
+
+

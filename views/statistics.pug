@@ -1,0 +1,230 @@
+extends layout
+
+block content
+    script(src='/javascripts/angular-controllers/statistics_controller.js')
+    .main(ng-app="statistics", ng-controller="myController", ng-cloak)
+        h1.page-header.text-center #{title}
+        .col-md-12
+            .alert.alert-danger.text-center(ng-if="errorMessage") {{errorMessage}}
+            .alert.alert-success.text-center(ng-if="successMessage") {{successMessage}}
+        .col-md-12.text-center
+            h2 Select A Project
+            select.form-control(style="text-align-last:center;", ng-model="filter.projectID", ng-options="project.id as project.project for project in projects")
+        .col-md-12(ng-if="filter.projectID != ''")
+            .col-md-12.text-center
+                .col-md-6.col-sm-12
+                    h2 Leaderboard - Global
+                    table.table.table-bordered.table-hover.table-responsive.centered-table-header(ng-if="leaderboard.length > 0")
+                        thead.bg-primary
+                            tr
+                                th #
+                                th Name
+                                th Average Questions Per Second
+                                th Average Correct Percentage
+                                th Score
+                        tbody
+                            tr(ng-repeat="leader in leaderboard")
+                                td {{$index + 1}}
+                                td {{leader.firstname}} {{leader.lastname}}
+                                td {{leader.average_question_per_second}}
+                                td {{leader.average_correct_percentage}}%
+                                td {{leader.score}}
+                    .col-md-12(ng-if="leaderboard.length == 0 && loadingLeaderboard")
+                        i.fa.fa-spinner.fa-spin.fa-3x.fa-fw
+                    .col-md-12(ng-if="leaderboard.length == 0 && !loadingLeaderboard")
+                        h3 Sorry, no leaders found
+                .col-md-6.col-sm-12
+                    h2 Leaderboard - Today
+                    table.table.table-bordered.table-hover.table-responsive.centered-table-header(ng-if="leaderboardToday.length > 0")
+                        thead.bg-primary
+                            tr
+                                th #
+                                th Name
+                                th Average Questions Per Second
+                                th Average Correct Percentage
+                                th Score
+                        tbody
+                            tr(ng-repeat="leader in leaderboardToday")
+                                td {{$index + 1}}
+                                td {{leader.firstname}} {{leader.lastname}}
+                                td {{leader.average_question_per_second}}
+                                td {{leader.average_correct_percentage}}%
+                                td {{leader.score}}
+                    .col-md-12(ng-if="leaderboardToday.length == 0 && loadingLeaderboardToday")
+                        i.fa.fa-spinner.fa-spin.fa-3x.fa-fw
+                    .col-md-12(ng-if="leaderboardToday.length == 0 && !loadingLeaderboardToday")
+                        h3 Sorry, no leaders found
+            .col-md-12.text-center
+                h2 Top 5 Questions Answered Incorrectly
+                table.table.table-bordered.table-hover.table-responsive.centered-table-header(ng-if="questions.length > 0")
+                    thead.bg-primary
+                        tr
+                            th #
+                            th Question
+                            th Incorrect Answers
+                    tbody
+                        tr(ng-repeat="question in questions")
+                            td {{$index + 1}}
+                            td 
+                                a(href="", ng-click="selectQuestion(question)") {{question.question}}
+                            td {{question.count_incorrect}}
+                i.fa.fa-spinner.fa-spin.fa-3x.fa-fw(ng-if="questions.length == 0 && loadingQuestions")
+                h3.text-center(ng-if="questions.length == 0 && !loadingQuestions") Sorry, no questions found
+            .col-md-12.text-center(ng-if="selectedQuestion!=''")
+                h3 {{selectedQuestion.question}}
+                table.table.table-bordered.table-hover.table-responsive.centered-table-header(ng-if="questionsDetailed.length > 0")
+                    thead.bg-primary
+                        tr
+                            th Answer
+                            th Times Chosen
+                    tbody
+                        tr(ng-repeat="detail in questionsDetailed")
+                            td {{detail.answer}}
+                            td {{detail.number_of_answers}}
+                .col-md-12.text-center(ng-if="questionsDetailed.length == 0 && loadingQuestionDetails")
+                    i.fa.fa-spinner.fa-spin.fa-3x.fa-fw
+                .col-md-12(ng-if="questionsDetailed.length == 0 && !loadingQuestionDetails")
+                    h3.text-center Sorry, no details found
+                h2
+                    button.btn.btn-primary(ng-click="clearQuestion()") Clear
+            .col-md-12.text-center
+                h2 Personal User Stats
+                h3 Please Select A User
+                .col-md-4
+                .col-md-4
+                    select.form-control(style="text-align-last:center;", ng-model="personalInfoFilter.username", ng-options="user.username as user.username for user in users")
+                    h2(ng-if="personalInfoFilter.username!=''") {{personalInfoFilter.firstname}} {{personalInfoFilter.lastname}} Stats
+                .col-md-4
+                .col-md-12.text-center(ng-if="personalInfoFilter.username!=''")
+                    h2 Top 10 Questions Answered Incorrectly
+                    table.table.table-bordered.table-hover.table-responsive.centered-table-header(ng-if="personalInfo.length > 0")
+                        thead.bg-primary
+                            tr
+                                th #
+                                th Question
+                                th Incorrect Answers
+                        tbody
+                            tr(ng-repeat="info in personalInfo")
+                                td {{$index + 1}}
+                                td 
+                                    a(href="", ng-click="getPersonalQuestionInfo(info.id, info.question)") {{info.question}}
+                                td {{info.count_answers}}
+                    .col-md-12(ng-if="personalInfo.length == 0 && loadingPersonalInfo && personalInfoFilter.username!=''")
+                        i.fa.fa-spinner.fa-spin.fa-3x.fa-fw
+                    .col-md-12(ng-if="personalInfo.length == 0 && !loadingPersonalInfo && personalInfoFilter.username!=''")
+                        h3 Sorry, no stats found
+                .col-md-12(ng-if="selectedPersonalQuestion!=''")
+                    h3 {{selectedPersonalQuestion}}
+                    table.table.table-bordered.table-hover.table-responsive.centered-table-header(ng-if="personalQuestionInfo.length > 0")
+                        thead.bg-primary
+                            tr
+                                th #
+                                th Answer
+                                th Times Chosen
+                        tbody
+                            tr(ng-repeat="questionInfo in personalQuestionInfo")
+                                td {{$index + 1}}
+                                td {{questionInfo.answer}}
+                                td {{questionInfo.count_answers}}
+                    .col-md-12(ng-if="personalQuestionInfo.length == 0 && loadingPersonalQuestionInfo && selectedPersonalQuestion!=''")
+                        i.fa.fa-spinner.fa-spin.fa-3x.fa-fw
+                    .col-md-12(ng-if="personalQuestionInfo.length == 0 && !loadingPersonalQuestionInfo && selectedPersonalQuestion!=''")
+                        h3 Sorry, no stats found
+                .col-md-12(ng-if="personalInfoFilter.username!=''")
+                    h2 Personal Best
+                .col-md-12.custom-overflow(ng-if="personalInfoFilter.username!=''")
+                    table.table.table-bordered.table-responsive.custom-table(ng-show="personalBest.length > 0")
+                        thead.bg-primary
+                            tr
+                                th Test
+                                th Start
+                                th Finish
+                                th Duration (seconds)
+                                th Questions
+                                th Questions Per seconds
+                                th Correct Answers
+                                th Percentage
+                                th Score
+                        tbody
+                            tr(ng-repeat="best in personalBest")
+                                td 
+                                    a(href="", ng-click="selectSession(best)") {{best.test}}
+                                td {{best.start}}
+                                td {{best.finish}}
+                                td {{best.duration}}
+                                td {{best.questions}}
+                                td {{best.average_question_per_second}}
+                                td {{best.correct_answers}}
+                                td {{best.correct_answers_percentage}}%
+                                td {{best.score}}
+                    .col-md-12(ng-if="personalBest.length == 0 && loadingPersonalBest")
+                        i.fa.fa-spinner.fa-spin.fa-3x.fa-fw
+                    .col-md-12(ng-if="personalBest.length == 0 && !loadingPersonalBest")
+                        h3 Sorry, no stats found
+            .col-md-12.text-center
+                h2 Sessions
+            .col-xs-12.col-sm-12.col-md-12
+                table.table.table-bordered.table-hover.table-responsive.custom-table(ng-if="testResults.length > 0")
+                    thead.bg-primary
+                        tr
+                            th Start
+                            th Finish
+                            th Username
+                            th Test
+                    tbody
+                        tr
+                            td
+                                .dropdown
+                                    a.dropdown-toggle(id="dropdown1", role="button", data-toggle="dropdown", data-target="", href="")
+                                        .input-group
+                                            input.form-control(ng-model="filter.date_from | date:'yyyy-MM-dd HH:mm:ss'", type="text")
+                                            span.input-group-addon
+                                                i.glyphicon.glyphicon-calendar
+                                    ul.dropdown-menu(role="menu", aria-labelledby="dLabel")
+                                        datetimepicker(ng-model="filter.date_from", data-datetimepicker-config="{ dropdownSelector: '#dropdown1' }")
+                            td
+                                .dropdown
+                                    a.dropdown-toggle(id="dropdown2", role="button", data-toggle="dropdown", data-target="", href="")
+                                        .input-group
+                                            input.form-control(ng-model="filter.date_to | date:'yyyy-MM-dd HH:mm:ss'", type="text")
+                                            span.input-group-addon
+                                                i.glyphicon.glyphicon-calendar
+                                    ul.dropdown-menu(role="menu", aria-labelledby="dLabel")
+                                        datetimepicker(ng-model="filter.date_to", data-datetimepicker-config="{ dropdownSelector: '#dropdown2' }")
+                            td
+                                select.form-control(ng-model="filter.username", ng-options="user.username as user.username for user in users")
+                            td
+                                select.form-control(ng-model="filter.test", ng-options="test.test as test.test for test in tests")
+            .col-xs-12.col-sm-12.col-md-12(ng-show="filteredResult.length > 0")
+                button(ng-disabled="currentPage == 0" ng-click="currentPage=currentPage-1") Previous
+                button(ng-disabled="true") {{currentPage+1}}/{{pages}}
+                button(ng-disabled="currentPage >= filteredResult.length/pageSize - 1" ng-click="currentPage=currentPage+1") Next        
+            .col-xs-12.col-sm-12.col-md-12.custom-overflow
+                table.table.table-bordered.table-responsive.custom-table(ng-show="filteredResult.length > 0")
+                    thead.bg-primary
+                        tr
+                            th Name
+                            th Test
+                            th Start
+                            th Finish
+                            th Duration (seconds)
+                            th Questions
+                            th Questions Per seconds
+                            th Correct Answers
+                            th Percentage
+                    tbody
+                        tr(ng-repeat="result in testResults | resultsfilter:filter.date_from:filter.date_to:filter.test:filter.username:currentPage*pageSize:this | limitTo:pageSize", ng-class="{'btn-success': selectedSession.id == result.id}")
+                            td {{result.firstname}} {{result.lastname}}
+                            td 
+                                a(href="", ng-click="selectSession(result)") {{result.test}}
+                            td {{result.start}}
+                            td {{result.finish}}
+                            td {{result.duration}}
+                            td {{result.questions}}
+                            td {{result.average_question_per_second}}
+                            td {{result.correct_answers}}
+                            td {{result.correct_answers_percentage}}%
+            .col-md-12.text-center(ng-if="filteredResult.length == 0 && loadingResults")
+                i.fa.fa-spinner.fa-spin.fa-3x.fa-fw
+            .col-md-12(ng-if="filteredResult.length == 0 && !loadingResults")
+                h3.text-center Sorry, no sessions found

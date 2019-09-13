@@ -1,0 +1,19 @@
+<div class="modal-header">
+    <h4 class="modal-title" id="modal-title">Results of {{$ctrl.items.session.test}} by {{$ctrl.items.session.firstname}} {{$ctrl.items.session.lastname}}</h4>
+    <h5>Session Started: {{$ctrl.items.session.start}}</h5>
+    <h5>Session Finished: {{$ctrl.items.session.finish}}</h5>
+</div>
+<div class="modal-body" id="modal-body">
+    <div ng-repeat="answer in $ctrl.items.resultAnswers" class="col-md-12">
+        <h4><b>Question {{$index + 1}}:</b> {{answer.question}}</h5>
+        <img class="question-image" ng-if="answer.image" src="/uploads/{{answer.image}}">
+        <h5 ng-if="answer.auto_selected == 0"><b>Chosen Answer:</b> {{answer.answer}}</h5>
+        <h5 ng-if="answer.auto_selected == 1"><b>Automatically Chosen Incorrect Answer:</b> {{answer.answer}}</h5>
+        <h5><b>Correct Answer:</b> {{answer.correct_answer}}</h5>
+        <i ng-if="answer.answer == answer.correct_answer" class="fa fa-check-circle fa-3x text-success"></i>
+        <i ng-if="answer.answer != answer.correct_answer" class="fa fa-times fa-3x text-danger"></i>
+    </div>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary" type="button" ng-click="$ctrl.ok()">OK</button>
+</div>

@@ -1,0 +1,281 @@
+/*
+ * Base structure
+ */
+
+
+/* Move down content because we have a fixed navbar that is 50px tall */
+
+body {
+    padding-top: 50px;
+    /*background: linear-gradient(to bottom, #21334e, #2980b9);*/
+}
+
+
+/*
+ * Global add-ons
+ */
+
+.sub-header {
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+
+/*
+ * Top navigation
+ * Hide default border to remove 1px line.
+ */
+
+.navbar-fixed-top {
+    border: 0;
+}
+
+
+/*
+ * Sidebar
+ */
+
+
+/* Hide for mobile, show later */
+
+.sidebar {
+    display: none;
+}
+
+@media (min-width: 768px) {
+    .sidebar {
+        position: fixed;
+        top: 51px;
+        bottom: 0;
+        left: 0;
+        z-index: 1000;
+        display: block;
+        padding: 20px;
+        overflow-x: hidden;
+        overflow-y: auto;
+        /* Scrollable contents if viewport is shorter than content. */
+        background-color: #f5f5f5;
+        border-right: 1px solid #eee;
+    }
+}
+
+
+/* Sidebar navigation */
+
+.nav-sidebar {
+    margin-right: -21px;
+    /* 20px padding + 1px border */
+    margin-bottom: 20px;
+    margin-left: -20px;
+}
+
+.nav-sidebar>li>a {
+    padding-right: 20px;
+    padding-left: 20px;
+}
+
+.nav-sidebar>.active>a,
+.nav-sidebar>.active>a:hover,
+.nav-sidebar>.active>a:focus {
+    color: #fff;
+    background-color: #428bca;
+}
+
+
+/*
+ * Main content
+ */
+
+.main {
+    padding: 20px;
+}
+
+@media (min-width: 768px) {
+    .main {
+        padding-right: 40px;
+        padding-left: 40px;
+    }
+}
+
+.main .page-header {
+    margin-top: 0;
+}
+
+.big-button {
+    width: 100%;
+    margin-top: 20px;
+    height: 250px;
+    /*font-size: 25px;*/
+    -webkit-transition: 1s;
+    /* For Safari 3.1 to 6.0 */
+    transition: 1s;
+}
+
+.big-button:hover {
+    background-color: #2196f3;
+    color: white;
+}
+
+.big-button h3:hover {
+    color: white;
+}
+
+.navbar-fixed-top {
+    /*background: linear-gradient(to right, #243B55, #141E30);*/
+}
+
+.main {
+    /*display: table;
+    margin-top: 200px;
+    background: white;*/
+    /*margin-left: 20px;
+    margin-right: 20px;*/
+    /*border-radius: 15px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+    transition: box-shadow 0.3s ease-in-out;
+    box-shadow: 0 1px 20px rgba(0, 0, 0, 0.65);*/
+}
+
+
+/*delays*/
+
+.delay-1 {
+    animation-delay: .25s;
+}
+
+.delay-2 {
+    animation-delay: .5s;
+}
+
+.delay-3 {
+    animation-delay: .75s;
+}
+
+.delay-4 {
+    animation-delay: 1s;
+}
+
+.form-signin h3 {
+    color: #01395a;
+}
+
+
+/*Button Login*/
+
+.btn-login {
+    background-color: #eb6e1f;
+}
+
+textarea:focus,
+textarea.form-control:focus,
+input.form-control:focus,
+input[type=text]:focus,
+input[type=password]:focus,
+input[type=email]:focus,
+input[type=number]:focus,
+[type=text].form-control:focus,
+[type=password].form-control:focus,
+[type=email].form-control:focus,
+[type=tel].form-control:focus,
+[contenteditable].form-control:focus {
+    -webkit-box-shadow: inset 0 -2px 0 #2196f3;
+    box-shadow: inset 0 -2px 0 #0169aa;
+}
+
+.login-logo-ds {
+    margin-left: auto;
+    margin-right: auto;
+    display: inherit;
+}
+
+.login-logo-al {
+    width: 119px;
+    display: inline-block;
+}
+
+
+/*Login Form Body*/
+
+.login-form-container {
+    background: #f5f5f5;
+    padding: 30px 0px;
+    border-radius: 20px;
+    -webkit-box-shadow: 0px 3px 5px 0px rgba(50, 50, 50, 0.44);
+    -moz-box-shadow: 0px 3px 5px 0px rgba(50, 50, 50, 0.44);
+    box-shadow: 0px 3px 5px 0px rgba(50, 50, 50, 0.44);
+}
+
+
+/*Powerd by Text*/
+
+.powered-p {
+    display: inline-block;
+}
+
+.alert-custom {
+    font-size: 15px;
+}
+
+body {
+    min-height: 100%;
+}
+
+.antwoord-veld {
+    display: block;
+    width: auto;
+    word-wrap: break-word;
+    font-size: initial;
+    text-transform: capitalize;
+}
+
+.button-custom {
+    width: 100%;
+    margin-top: 20px;
+    height: auto;
+    min-height: 250px;
+    -webkit-transition: 1s;
+    transition: 1s;
+	white-space: pre-line;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.taketestholder{
+    background: #f9f9f9;
+    padding: 20px;
+    -webkit-box-shadow: 0px 2px 3px 0px rgba(50, 50, 50, 0.68);
+    -moz-box-shadow: 0px 2px 3px 0px rgba(50, 50, 50, 0.68);
+    box-shadow: 0px 2px 3px 0px rgba(50, 50, 50, 0.68);
+    border-radius: 10px;
+}
+.text-center{
+	text-align:center;
+}
+
+.margin-left-20{
+	margin-left: 20px;
+}
+
+.app-modal-window .modal-dialog {
+  min-width: 800px;
+}
+
+.centered-table-header th {
+   text-align: center;   
+}
+
+.custom-overflow {
+  overflow: auto; 
+  height: 100%;
+}
+
+.custom-table > tbody > tr > td{
+    vertical-align: middle;
+    min-width: 200px;
+}
+
+.question-image{
+    max-width: 100%;
+    max-height: 100%;
+}

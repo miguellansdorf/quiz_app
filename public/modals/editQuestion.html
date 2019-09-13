@@ -1,0 +1,32 @@
+<div class="modal-header">
+</div>
+<div class="modal-body" id="modal-body">
+    <div class="col-md-12 text-center">
+        <div class="form-group">
+            <label for="Question">Question</label>
+            <input type="text" class="form-control" ng-model="$ctrl.question.question", placeholder="Question">
+            <label for="Duration">Duration</label>
+            <input type="number" class="form-control" ng-model="$ctrl.question.duration", placeholder="Duration" step=1 min=10>
+            <label for="Image">Image</label>
+            <img ng-if="$ctrl.question.image" class="question-image" src="/uploads/{{$ctrl.question.image}}">
+        </div>
+        <div class="form-group">
+            <input type="file" file-model="$ctrl.newImage">
+            <label for="Update Image">Update Or Remove Image</label>
+            <select class="form-control" ng-model="$ctrl.updateImage", ng-options="option.id as option.value for option in $ctrl.updateImageOptions"/>
+        </div>
+        <div class="form-group" ng-repeat="answer in $ctrl.questionAnswers">
+            <label for="Answer">Answer {{$index + 1}}</label>
+            <input type="text" class="form-control" ng-model="answer.answer">
+            <label for="Correct">Is this the correct answer?</label>
+            <select class="form-control" ng-model="answer.correct", ng-options="correct.id as correct.value for correct in $ctrl.answerCorrect"></select>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary" type="button" ng-click="$ctrl.performAction('Update')">Update</button>
+    <button class="btn btn-success" type="button" ng-click="$ctrl.performAction('Activate')" ng-if="$ctrl.question.active == 0">Activate</button>
+    <button class="btn btn-danger" type="button" ng-click="$ctrl.performAction('Deactivate')" ng-if="$ctrl.question.active == 1">Deactivate</button>
+    <button class="btn btn-danger" type="button" ng-click="$ctrl.performAction('Delete')" ng-if="$ctrl.angularUser.role_id == 3">Delete</button>
+    <button class="btn btn-warning" type="button" ng-click="$ctrl.cancel()">Cancel</button>
+</div>
