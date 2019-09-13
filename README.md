@@ -4,7 +4,8 @@ This app serves as a small quiz game in which users can create their own questio
 It can also be used to train new users in specific areas, for example creating a test about software related questions and letting a user answer the questions. In this way you can test their knowledge on the subject.
 
 ## Requirements
-NodeJS with express
+NodeJS
+
 MySQL (tested with MySQL 8. Also compatible with MySQL 5.6 and 5.7)
 
 ## installation guide
